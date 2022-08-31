@@ -26,6 +26,13 @@ jobs:
     - name: Install cert-manager
       run: ./tests/gh-actions/install_cert_manager.sh
 
+    - name: Build & Apply manifests
+      run: |
+        cd apps/katib/upstream
+        kubectl create ns kubeflow
+        kustomize build installs/katib-with-kubeflow | kubectl apply -f -
+        kubectl wait --for=condition=Ready pods --all -n kubeflow --timeout 180s
+
     - name: SSH Access
       uses: lhotari/action-upterm@v1
       with:
@@ -33,13 +40,6 @@ jobs:
         limit-access-to-actor: true
         ## limits ssh access and adds the ssh public keys of the listed GitHub users
         limit-access-to-users: annajung
-
-    - name: Build & Apply manifests
-      run: |
-        cd apps/katib/upstream
-        kubectl create ns kubeflow
-        kustomize build installs/katib-with-kubeflow | kubectl apply -f -
-        kubectl wait --for=condition=Ready pods --all -n kubeflow --timeout 180s
 
     - name: Create katib experiment
       run: |
