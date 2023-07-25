@@ -30,6 +30,12 @@ jobs:
       - name: Install cert-manager
         run: ./tests/gh-actions/install_cert_manager.sh
 
+      # TODO delete
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+        with:
+          limit-access-to-actor: true
+
       - name: Install knative
         run: ./tests/gh-actions/install_knative.sh
 
