@@ -22,9 +22,6 @@ jobs:
       - name: Create kubeflow namespace
         run: kustomize build common/kubeflow-namespace/base | kubectl apply -f -
 
-      - name: Allow scheduling on control plane
-        run: kubectl taint nodes kind-control-plane node-role.kubernetes.io/control-plane:NoSchedule-
-
       - name: Install Istio
         run: ./tests/gh-actions/install_istio.sh
 
