@@ -6,18 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
     steps:
-      - name: Create more disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/share/swift
-
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -33,17 +22,14 @@ jobs:
       - name: Create kubeflow namespace
         run: kustomize build common/kubeflow-namespace/base | kubectl apply -f -
 
+      - name: Allow scheduling on control plane
+        run: kubectl taint nodes kind-control-plane node-role.kubernetes.io/control-plane:NoSchedule-
+
       - name: Install Istio
         run: ./tests/gh-actions/install_istio.sh
 
       - name: Install cert-manager
         run: ./tests/gh-actions/install_cert_manager.sh
-
-      # TODO delete
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
-        with:
-          limit-access-to-actor: true
 
       - name: Install knative
         run: ./tests/gh-actions/install_knative.sh
